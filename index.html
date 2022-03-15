@@ -6,5 +6,145 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
-  <body></body>
+  <style>
+    #search_results {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-gap: 10px;
+      font-family: cursive;
+    }
+    #header {
+      display: flex;
+      justify-content: space-around;
+    }
+    #search {
+      margin: auto;
+      font-family: cursive;
+    }
+    input {
+      width: 360px;
+      height: 30px;
+    }
+    #butto {
+      height: 35px;
+      width: 100px;
+      background-color: #f05353;
+      color: white;
+      border: none;
+      font-family: cursive;
+    }
+    #cont {
+      display: flex;
+      overflow: scroll;
+    }
+    .p {
+      height: 40px;
+      width: 180px;
+      margin-bottom: 10px;
+      border: none;
+      margin-right: 10px;
+      font-family: cursive;
+    }
+    .p:hover,
+    #butto {
+      background-color: #f05353;
+      color: white;
+      cursor: pointer;
+    }
+  </style>
+  <body>
+    <header>
+      <div id="header">
+        <div id="image">
+          <img
+            src="https://cdn.mos.cms.futurecdn.net/8gzcr6RpGStvZFA2qRt4v6-970-80.jpg.webp"
+            height="80px"
+            width="180px"
+          />
+        </div>
+        <div id="search">
+          <input
+            type="text"
+            id="video"
+            placeholder="What are you looking for .."
+          />
+          <button id="butto" onclick="searchVideo()">Search</button>
+        </div>
+      </div>
+    </header>
+    <hr />
+    <div id="cont">
+      <div id="label">
+        <button class="p">Home</button> <br />
+        <button class="p">Explore</button><br />
+        <button class="p">Subscription</button> <br />
+        <button class="p">History</button>
+      </div>
+
+      <div id="search_results"></div>
+    </div>
+  </body>
 </html>
+
+<script>
+  //   const API = "AIzaSyCPmdDVtC3_b9j67AJMNBqzZTCnXzuULJQ";
+  const API = "AIzaSyBhvSCDIGP-s1940tmSJlL6gwY9bjroA2U";
+
+  const result_div = document.getElementById("search_results");
+
+  async function searchVideo() {
+    try {
+      let video_query = document.getElementById("video").value;
+
+      let response = await fetch(
+        `https://youtube.googleapis.com/youtube/v3/search?part=snippet&q=${video_query}&type=video&key=${API}&maxResults=20`
+      );
+
+      let data = await response.json();
+      let videos = data.items;
+      console.log("data", data);
+
+      appendVideos(videos);
+    } catch (e) {
+      console.log("e", e);
+    }
+  }
+  // function appendVideos();
+
+  const appendVideos = (items) => {
+    result_div.innerHTML = null;
+
+    items.forEach(({ snippet, id: { videoId } }) => {
+      console.log(snippet);
+      var image = document.createElement("img");
+      //   let iframe = document.createElement("iframe");
+      let title = document.createElement("p");
+      // title.setAttribute ="class , titlee";
+      var div = document.createElement("div");
+      image.src = snippet.thumbnails.medium.url;
+      title.innerText = snippet.title;
+      // console.log("p:", p);
+
+      // iframe.src = `https://www.youtube.com/embed/${(image, videoId)}`;
+      // iframe.setAttribute("allowfullscreen", true);
+      // iframe.height = "215";
+      // iframe.width = "318";
+
+      var move = {
+        snippet,
+        videoId,
+        video_query: document.getElementById("video").value,
+      };
+      div.onclick = () => {
+        Show(move);
+      };
+
+      div.append(image, title);
+      result_div.append(div);
+    });
+  };
+  function Show(data) {
+    localStorage.setItem("clicked_video", JSON.stringify(data));
+    window.location.href = "video.html";
+  }
+</script>
